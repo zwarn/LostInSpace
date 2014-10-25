@@ -25,9 +25,5 @@ public class AstroidScript : MonoBehaviour {
 			Destroy(gameObject);
 			Destroy(obj.gameObject);
 		}
-
-		if (name == "spaceship") {
-			Destroy(obj.gameObject);
-		}
 	}
 }

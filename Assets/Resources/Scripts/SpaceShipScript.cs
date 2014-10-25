@@ -27,4 +27,13 @@ public class SpaceShipScript : MonoBehaviour {
 		}
 	
 	}
+
+	void OnTriggerEnter2D (Collider2D obj) {
+		var name = obj.gameObject.name;
+		
+		if (name == "turretbullet(Clone)") {
+			Destroy(gameObject);
+			Destroy(obj.gameObject);
+		}
+	}
 }
