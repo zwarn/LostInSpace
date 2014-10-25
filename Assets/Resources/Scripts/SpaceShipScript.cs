@@ -5,6 +5,7 @@ public class SpaceShipScript : MonoBehaviour {
 
 	public float rotationSpeed;
 	public float acceleration;
+	public GameObject bullet;
 
 	// Use this for initialization
 	void Start () {
@@ -19,6 +20,11 @@ public class SpaceShipScript : MonoBehaviour {
 		}
 
 		transform.Rotate (Vector3.forward * Input.GetAxis("Horizontal") * rotationSpeed);
+
+		if (Input.GetButtonDown ("Fire")) {
+			Instantiate(bullet, transform.Find("BulletSpawnerL").transform.position, transform.rotation );
+			Instantiate(bullet, transform.Find("BulletSpawnerR").transform.position, transform.rotation );
+		}
 	
 	}
 }
