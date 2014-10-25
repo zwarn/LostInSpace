@@ -32,7 +32,7 @@ public class SpaceShipScript : MonoBehaviour {
 		var name = obj.gameObject.name;
 		
 		if (name == "turretbullet(Clone)") {
-			Destroy(gameObject);
+			//Destroy(gameObject);
 			Destroy(obj.gameObject);
 		}
 	}
