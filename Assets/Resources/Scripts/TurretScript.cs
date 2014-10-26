@@ -11,7 +11,7 @@ public class TurretScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		toFire = Time.time + cooldown + Random.Range(0,1);
+		toFire = Time.time + cooldown + Random.Range(0f,1f);
 	}
 	
 	// Update is called once per frame
@@ -28,9 +28,22 @@ public class TurretScript : MonoBehaviour {
 		Vector3 bla = transform.eulerAngles;
 
 		if (Time.time > toFire) {
-			toFire = Time.time + cooldown + Random.Range(0,1);
+			float random = Random.Range(0f,1f);
+			toFire = Time.time + cooldown + random;
+
+			Debug.Log (random);
+
 			Instantiate (turretbullet, transform.Find("BulletSpawner").transform.position, Quaternion.Euler (new Vector3(bla.x, bla.y, bla.z-90)));
 		}
 
+	}
+
+	void OnTriggerEnter2D (Collider2D obj) {
+		var name = obj.gameObject.name;
+		
+		if (name == "bullet(Clone)") {
+			Destroy(gameObject);
+			Destroy(obj.gameObject);
+		}
 	}
 }

@@ -6,6 +6,8 @@ public class SpaceShipScript : MonoBehaviour {
 	public float rotationSpeed;
 	public float acceleration;
 	public GameObject bullet;
+	public GameObject particleSystemR;
+	public GameObject particleSystemL;
 
 	// Use this for initialization
 	void Start () {
@@ -17,6 +19,15 @@ public class SpaceShipScript : MonoBehaviour {
 
 		if (Input.GetButton ("Up")) {
 			rigidbody2D.AddForce(transform.up * acceleration);
+			if (!particleSystemR.particleSystem.isPlaying) {
+				particleSystemR.particleSystem.Play();
+				particleSystemL.particleSystem.Play();
+			}
+		} else {
+			if (particleSystemR.particleSystem.isPlaying) {
+				particleSystemR.particleSystem.Stop();
+				particleSystemL.particleSystem.Stop();
+			}
 		}
 
 		transform.Rotate (Vector3.forward * Input.GetAxis("Horizontal") * rotationSpeed);
