@@ -7,6 +7,9 @@ public class TurretScript : MonoBehaviour {
 	public GameObject turretbullet;
 	public float cooldown = 3;
 	float toFire;
+	float life = 100;
+	public GameObject particleSystemFire;
+	public GameObject particleSystemSpark;
 
 
 	// Use this for initialization
@@ -17,6 +20,16 @@ public class TurretScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+		if (life < 80) {
+			if (!particleSystemSpark.particleSystem.isPlaying) {
+				particleSystemSpark.particleSystem.Play();
+			}
+		}
+		if (life < 35) {
+			if (!particleSystemFire.particleSystem.isPlaying) {
+				particleSystemFire.particleSystem.Play();
+			}
+		}
 		if (target == null) {
 			target = GameObject.Find("spaceship");
 		}
@@ -42,8 +55,11 @@ public class TurretScript : MonoBehaviour {
 		var name = obj.gameObject.name;
 		
 		if (name == "bullet(Clone)") {
-			Destroy(gameObject);
+			life = life - 20;
 			Destroy(obj.gameObject);
 		}
+		if (life <= 0) {
+			Destroy(gameObject);
+				}
 	}
 }
