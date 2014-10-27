@@ -8,6 +8,7 @@ public class SpaceShipScript : MonoBehaviour {
 	public GameObject bullet;
 	public GameObject particleSystemR;
 	public GameObject particleSystemL;
+	public GameObject particleSystemShield;
 
 	// Use this for initialization
 	void Start () {
@@ -64,6 +65,7 @@ public class SpaceShipScript : MonoBehaviour {
 		var name = obj.gameObject.name;
 		
 		if (name == "turretbullet(Clone)") {
+			particleSystemShield.particleSystem.Play();
 			//Destroy(gameObject);
 			Destroy(obj.gameObject);
 		}
