@@ -4,11 +4,19 @@ using System.Collections;
 public class OnDeathEffekt : MonoBehaviour {
 
 	public GameObject onDeathEffect;
+	bool isQuitting = false;
+
+
+	void OnApplicationQuit()
+	{
+		isQuitting = true;
+	}
 
 	public void OnDestroy() {
 
-		Instantiate (onDeathEffect, transform.position, transform.rotation);
-
+		if (!isQuitting) {
+			Instantiate (onDeathEffect, transform.position, transform.rotation);
+		}
 	}
 
 }
