@@ -66,17 +66,6 @@ public class SpaceShipScript : MonoBehaviour {
 			}
 		}
 
-		//This reduces the players velocity over time, so that he eventually stands still
-
-		if (rigidbody2D.velocity.x > 0.1f) {
-						rigidbody2D.AddForce (new Vector3 (-1f, 0f, 0f) * acceleration / 10);
-				} else if (rigidbody2D.velocity.x < -0.1f) {
-						rigidbody2D.AddForce (new Vector3 (1f, 0f, 0f) * acceleration / 10);
-				} else if (rigidbody2D.velocity.y > 0.1f) {
-						rigidbody2D.AddForce (new Vector3 (0f, -1f, 0f) * acceleration / 10);
-				} else if (rigidbody2D.velocity.x < 0.1f) {
-						rigidbody2D.AddForce (new Vector3 (0f, 1f, 0f) * acceleration / 10);
-				}
 		transform.Rotate (Vector3.forward * Input.GetAxis("Horizontal") * rotationSpeed);
 
 		if (Input.GetButtonDown ("Fire")) {
