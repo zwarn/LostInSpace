@@ -9,6 +9,17 @@ public class SpaceShipScript : MonoBehaviour {
 	public GameObject particleSystemR;
 	public GameObject particleSystemL;
 	public GameObject particleSystemShield;
+	public GameObject particleSystemFire;
+	public GameObject particleSystemFireSmoke;
+	public GameObject particleSystemSpark;
+	public AudioClip fireSound;
+	public AudioClip shieldSound;
+	public AudioClip onBeingHit;
+
+	public float shield = 3f;
+	public float maxShield = 3f;
+
+	public float life = 100f;
 
 	// Use this for initialization
 	void Start () {
@@ -17,6 +28,20 @@ public class SpaceShipScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+		if (life < 80) {
+			if (!particleSystemSpark.particleSystem.isPlaying) {
+				particleSystemSpark.particleSystem.Play();
+			}
+		}
+		if (life < 35) {
+			if (!particleSystemFire.particleSystem.isPlaying) {
+				particleSystemFire.particleSystem.Play();
+			}
+			if (!particleSystemFireSmoke.particleSystem.isPlaying) {
+				particleSystemFireSmoke.particleSystem.Play();
+			}
+		}
 
 		if (Input.GetButton ("Up")) {
 
@@ -55,6 +80,7 @@ public class SpaceShipScript : MonoBehaviour {
 		transform.Rotate (Vector3.forward * Input.GetAxis("Horizontal") * rotationSpeed);
 
 		if (Input.GetButtonDown ("Fire")) {
+			AudioSource.PlayClipAtPoint(fireSound, transform.Find("Spaceship").transform.position);
 			Instantiate(bullet, transform.Find("BulletSpawnerL").transform.position, transform.rotation );
 			Instantiate(bullet, transform.Find("BulletSpawnerR").transform.position, transform.rotation );
 		}
@@ -65,7 +91,20 @@ public class SpaceShipScript : MonoBehaviour {
 		var name = obj.gameObject.name;
 		
 		if (name == "turretbullet(Clone)") {
-			particleSystemShield.particleSystem.Play();
+
+			if (shield > 0f) {
+				shield = shield - 1;
+				particleSystemShield.particleSystem.Play();
+				AudioSource.PlayClipAtPoint(shieldSound, transform.Find("Spaceship").transform.position);
+			} else {
+				life = life - 10;
+				AudioSource.PlayClipAtPoint(onBeingHit, transform.Find("Spaceship").transform.position);
+				//I would like a short shake of the camera here.
+				if (life <= 0) {
+					Destroy(gameObject);
+				}
+			}
+
 			//Destroy(gameObject);
 			Destroy(obj.gameObject);
 		}
