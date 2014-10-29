@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[RequireComponent (typeof (DamageScript))]
 public class SpaceShipScript : MonoBehaviour {
 
 	public float rotationSpeed;
@@ -13,19 +14,14 @@ public class SpaceShipScript : MonoBehaviour {
 
 	public float maxShield = 3f;
 	public float shield = 3f;
+	public float maxlife = 100f;
 	public float life = 100f;
 
 	List<WeaponScript> weapons;
 	List<ParticleSystem> engineEffects;
 	List<ParticleSystem> shieldEffects;
 
-	[System.Serializable]
-	public class DamageAnimationEntry {
-		public float Damage;
-		public GameObject Effect;
-	}
-
-	public List<DamageAnimationEntry> damages;
+	DamageScript damagescript;
 
 	bool thrust = false;
 
@@ -33,6 +29,9 @@ public class SpaceShipScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+
+		damagescript = GetComponent<DamageScript> ();
+
 		weapons = new List<WeaponScript> ();
 		WeaponScript[] weaponArray = GetComponentsInChildren<WeaponScript> ();
 		for (int i = 0; i < weaponArray.Length; i++) {
@@ -56,17 +55,6 @@ public class SpaceShipScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-
-		foreach (DamageAnimationEntry entry in damages) {
-			if (life < entry.Damage && !entry.Effect.particleSystem.isPlaying) {
-				entry.Effect.particleSystem.Play ();
-			}
-
-			if (life > entry.Damage && entry.Effect.particleSystem.isPlaying) {
-				entry.Effect.particleSystem.Stop ();
-			}
-		}
-
 		if (Input.GetButton ("Up")) {
 			if (!thrust) {
 				startEngineEffect();
@@ -86,7 +74,7 @@ public class SpaceShipScript : MonoBehaviour {
 		transform.Rotate (Vector3.forward * Input.GetAxis("Horizontal") * rotationSpeed);
 
 		if (Input.GetButtonDown ("Fire")) {
-			AudioSource.PlayClipAtPoint(fireSound, transform.Find("Spaceship").transform.position);
+			AudioSource.PlayClipAtPoint(fireSound, transform.position);
 			foreach (WeaponScript weapon in weapons) {
 				weapon.fire();
 			}
@@ -99,22 +87,26 @@ public class SpaceShipScript : MonoBehaviour {
 		
 		if (name == "turretbullet(Clone)") {
 
-			if (shield > 0f) {
-				shield = shield - 1;
-				startShieldEffect();
-				AudioSource.PlayClipAtPoint(shieldSound, transform.Find("Spaceship").transform.position);
-			} else {
-				life = life - 10;
-				AudioSource.PlayClipAtPoint(onBeingHit, transform.Find("Spaceship").transform.position);
-				//I would like a short shake of the camera here.
-				if (life <= 0) {
-					Destroy(gameObject);
-				}
-			}
+			gettingHit();
 
-			//Destroy(gameObject);
 			Destroy(obj.gameObject);
 		}
+	}
+
+	void gettingHit() {
+		if (shield > 0f) {
+			shield = shield - 1;
+			startShieldEffect();
+			AudioSource.PlayClipAtPoint(shieldSound, transform.position);
+		} else {
+			life = life - 10;
+			AudioSource.PlayClipAtPoint(onBeingHit, transform.position);
+			//I would like a short shake of the camera here.
+			if (life <= 0) {
+				Destroy(gameObject);
+			}
+		}
+		damagescript.setLife (life * 100 / maxlife);
 	}
 
 	void startEngineEffect() {

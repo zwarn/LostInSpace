@@ -1,37 +1,37 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
+[RequireComponent (typeof (DamageScript))]
 public class TurretScript : MonoBehaviour {
 
 	public GameObject target;
-	public GameObject turretbullet;
 	public float cooldown = 3;
 	float toFire;
 	float life = 100;
-	public GameObject particleSystemFire;
-	public GameObject particleSystemSpark;
+	float maxlife = 100;
 
+	DamageScript damagescript;
+
+	List<WeaponScript> weapons;
 
 	// Use this for initialization
 	void Start () {
 		toFire = Time.time + cooldown + Random.Range(0f,1f);
+		weapons = new List<WeaponScript>();
+		WeaponScript[] weaponArray = GetComponentsInChildren<WeaponScript> ();
+		for (int i = 0; i < weaponArray.Length; i++) {
+			weapons.Add(weaponArray[i]);
+			weaponArray[i].register(gameObject);
+		}
+		damagescript = GetComponent<DamageScript> ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		if (life < 80) {
-			if (!particleSystemSpark.particleSystem.isPlaying) {
-				particleSystemSpark.particleSystem.Play();
-			}
-		}
-		if (life < 35) {
-			if (!particleSystemFire.particleSystem.isPlaying) {
-				particleSystemFire.particleSystem.Play();
-			}
-		}
 		if (target == null) {
-			target = GameObject.Find("spaceship");
+			target = GameObject.Find("Spaceship");
 		}
 
 		Vector3 dir = target.transform.position - transform.position;
@@ -43,7 +43,9 @@ public class TurretScript : MonoBehaviour {
 		if (Time.time > toFire) {
 			float random = Random.Range(0f,1f);
 			toFire = Time.time + cooldown + random;
-			Instantiate (turretbullet, transform.Find("BulletSpawner").transform.position, Quaternion.Euler (new Vector3(bla.x, bla.y, bla.z-90)));
+			foreach (WeaponScript weapon in weapons) {
+				weapon.fire();
+			}
 		}
 
 	}
@@ -57,6 +59,7 @@ public class TurretScript : MonoBehaviour {
 		}
 		if (life <= 0) {
 			Destroy(gameObject);
-				}
+		}
+		damagescript.setLife (life * 100 / maxlife);
 	}
 }

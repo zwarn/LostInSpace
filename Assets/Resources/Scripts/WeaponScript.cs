@@ -7,6 +7,7 @@ public class WeaponScript : MonoBehaviour {
 	GameObject owner;
 
 	public void fire() {
+		Debug.Log ("fire!");
 		Instantiate(bullet, transform.position, transform.rotation );
 	}
 
