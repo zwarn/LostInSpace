@@ -1,77 +1,95 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SpaceShipScript : MonoBehaviour {
 
 	public float rotationSpeed;
 	public float acceleration;
-	public GameObject bullet;
-	public GameObject particleSystemR;
-	public GameObject particleSystemL;
-	public GameObject particleSystemShield;
-	public GameObject particleSystemFire;
-	public GameObject particleSystemFireSmoke;
-	public GameObject particleSystemSpark;
+
 	public AudioClip fireSound;
 	public AudioClip shieldSound;
 	public AudioClip onBeingHit;
 
-	public float shield = 3f;
 	public float maxShield = 3f;
-
+	public float shield = 3f;
 	public float life = 100f;
+
+	List<WeaponScript> weapons;
+	List<ParticleSystem> engineEffects;
+	List<ParticleSystem> shieldEffects;
+
+	[System.Serializable]
+	public class DamageAnimationEntry {
+		public float Damage;
+		public GameObject Effect;
+	}
+
+	public List<DamageAnimationEntry> damages;
+
+	bool thrust = false;
+
+
 
 	// Use this for initialization
 	void Start () {
-	
+		weapons = new List<WeaponScript> ();
+		WeaponScript[] weaponArray = GetComponentsInChildren<WeaponScript> ();
+		for (int i = 0; i < weaponArray.Length; i++) {
+			weapons.Add(weaponArray[i]);
+			weaponArray[i].register(gameObject);
+		}
+
+		engineEffects = new List<ParticleSystem> ();
+		ParticleSystem[] engineArray = transform.FindChild ("EngineEffects").GetComponentsInChildren<ParticleSystem>();
+		for (int i = 0; i < engineArray.Length; i++) {
+			engineEffects.Add(engineArray[i]);
+		}
+
+		shieldEffects = new List<ParticleSystem> ();
+		ParticleSystem[] shieldArray = transform.FindChild ("ShieldEffects").GetComponentsInChildren<ParticleSystem>();
+		for (int i = 0; i < shieldArray.Length; i++) {
+			shieldEffects.Add(shieldArray[i]);
+		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		if (life < 80) {
-			if (!particleSystemSpark.particleSystem.isPlaying) {
-				particleSystemSpark.particleSystem.Play();
+
+		foreach (DamageAnimationEntry entry in damages) {
+			if (life < entry.Damage && !entry.Effect.particleSystem.isPlaying) {
+				entry.Effect.particleSystem.Play ();
 			}
-		}
-		if (life < 35) {
-			if (!particleSystemFire.particleSystem.isPlaying) {
-				particleSystemFire.particleSystem.Play();
-			}
-			if (!particleSystemFireSmoke.particleSystem.isPlaying) {
-				particleSystemFireSmoke.particleSystem.Play();
+
+			if (life > entry.Damage && entry.Effect.particleSystem.isPlaying) {
+				entry.Effect.particleSystem.Stop ();
 			}
 		}
 
 		if (Input.GetButton ("Up")) {
-
+			if (!thrust) {
+				startEngineEffect();
+			}
+			thrust = true;
 			// Caps the maximum speed of the player
-			if (rigidbody2D.velocity.sqrMagnitude > 15) {
-				if (!particleSystemR.particleSystem.isPlaying) {
-					particleSystemR.particleSystem.Play();
-					particleSystemL.particleSystem.Play();
-				}
-			}
-			else {
+			if (!(rigidbody2D.velocity.sqrMagnitude > 15)) {
 				rigidbody2D.AddForce(transform.up * acceleration);
-			}
-			if (!particleSystemR.particleSystem.isPlaying) {
-				particleSystemR.particleSystem.Play();
-				particleSystemL.particleSystem.Play();
-			}
+			} 
 		} else {
-			if (particleSystemR.particleSystem.isPlaying) {
-				particleSystemR.particleSystem.Stop();
-				particleSystemL.particleSystem.Stop();
+			if (thrust) {
+				stopEngineEffect();
 			}
+			thrust = false;
 		}
-
+		
 		transform.Rotate (Vector3.forward * Input.GetAxis("Horizontal") * rotationSpeed);
 
 		if (Input.GetButtonDown ("Fire")) {
 			AudioSource.PlayClipAtPoint(fireSound, transform.Find("Spaceship").transform.position);
-			Instantiate(bullet, transform.Find("BulletSpawnerL").transform.position, transform.rotation );
-			Instantiate(bullet, transform.Find("BulletSpawnerR").transform.position, transform.rotation );
+			foreach (WeaponScript weapon in weapons) {
+				weapon.fire();
+			}
 		}
 	
 	}
@@ -83,7 +101,7 @@ public class SpaceShipScript : MonoBehaviour {
 
 			if (shield > 0f) {
 				shield = shield - 1;
-				particleSystemShield.particleSystem.Play();
+				startShieldEffect();
 				AudioSource.PlayClipAtPoint(shieldSound, transform.Find("Spaceship").transform.position);
 			} else {
 				life = life - 10;
@@ -98,4 +116,23 @@ public class SpaceShipScript : MonoBehaviour {
 			Destroy(obj.gameObject);
 		}
 	}
+
+	void startEngineEffect() {
+		foreach (ParticleSystem particleSystem in engineEffects) {
+			particleSystem.Play();
+		}
+	}
+	
+	void stopEngineEffect() {
+		foreach (ParticleSystem particleSystem in engineEffects) {
+			particleSystem.Stop();
+		}
+	}
+
+	void startShieldEffect() {
+		foreach (ParticleSystem particleSystem in shieldEffects) {
+			particleSystem.Play();
+		}
+	}
+
 }

@@ -43,9 +43,6 @@ public class TurretScript : MonoBehaviour {
 		if (Time.time > toFire) {
 			float random = Random.Range(0f,1f);
 			toFire = Time.time + cooldown + random;
-
-			Debug.Log (random);
-
 			Instantiate (turretbullet, transform.Find("BulletSpawner").transform.position, Quaternion.Euler (new Vector3(bla.x, bla.y, bla.z-90)));
 		}
 
