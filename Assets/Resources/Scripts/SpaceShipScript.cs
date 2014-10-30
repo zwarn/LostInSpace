@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 [RequireComponent (typeof (DamageScript))]
 public class SpaceShipScript : MonoBehaviour {
@@ -16,6 +17,11 @@ public class SpaceShipScript : MonoBehaviour {
 	public float shield = 3f;
 	public float maxlife = 100f;
 	public float life = 100f;
+
+	public Text healthText;
+	public Text shieldText;
+	public Slider healthSlider;
+	public Slider shieldSlider;
 
 	List<WeaponScript> weapons;
 	List<ParticleSystem> engineEffects;
@@ -54,6 +60,11 @@ public class SpaceShipScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+		healthText.text = "Health : " + life + " / " + maxlife;
+		healthSlider.value = life / maxlife;
+		shieldText.text = "Shield : " + shield + "/" + maxShield;
+		shieldSlider.value = shield / maxShield;
 
 		if (Input.GetButton ("Up")) {
 			if (!thrust) {
